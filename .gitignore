@@ -1,8 +1,4 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+build/
 
 # Compiled Dynamic libraries
 *.so
