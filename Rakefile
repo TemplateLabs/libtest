@@ -7,13 +7,15 @@ CLEAN.include TEST_OBJS
 CC = 'cc'
 INCDIRS = '.'.pathmap('-I%p')
 
+CXXFLAGS = %w[-std=c++11].join ' '
+
 def source_for_object(name)
     base_name = name.pathmap("%{^build/,test/}X")
     TEST_SOURCES.find {|f| f.ext('') == base_name }
 end
 
 rule '.o' => ->(name){ source_for_object(name) } do |t|
-    sh "#{CC} #{INCDIRS} -c -o #{t.name} #{t.source}"
+    sh "#{CC} #{INCDIRS} #{CXXFLAGS} -c -o #{t.name} #{t.source}"
 end
 
 directory 'build'
