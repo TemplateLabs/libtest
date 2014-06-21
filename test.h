@@ -3,6 +3,7 @@
 
 #include "include/dispatcher.h"
 #include "include/registry.h"
+#include "include/reporter.h"
 
 #define BEGIN_TEST(_name) 		\
 namespace {				\
@@ -65,8 +66,17 @@ namespace test
 
     inline int run(int argc, char* argv[])
     {
+	Reporter reporter;
+
+	auto& dispatcher = Dispatcher::instance();
+	dispatcher.register_reporter(&reporter);
+
+	dispatcher.started();
+
 	for( auto& block : Registry::instance() )
 	    block();
+
+	dispatcher.finished();
 
 	return 0;
     }
