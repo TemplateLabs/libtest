@@ -1,6 +1,7 @@
 #ifndef LIBTEST_H
 #define LIBTEST_H
 
+#include "include/dispatcher.h"
 #include "include/registry.h"
 
 #define BEGIN_TEST(_name) 		\
@@ -24,12 +25,42 @@ namespace test
 
     inline void describe(const char* description, block_t block)
     {
-	block();
+	auto& dispatcher = Dispatcher::instance();
+
+	dispatcher.started_group();
+
+	try
+	{
+	    block();
+	}
+	catch(std::exception& e)
+	{
+	    dispatcher.caught(e);
+	}
+
+	dispatcher.finished_group();
     }
 
     inline void it(const char* description, block_t block)
     {
-	block();
+	auto& dispatcher = Dispatcher::instance();
+
+	dispatcher.started_example();
+
+	try
+	{
+	    block();
+	}
+	catch(const std::exception& e)
+	{
+	    dispatcher.caught(e);
+	}
+	catch(...)
+	{
+	    dispatcher.caught_unknown();
+	}
+
+    	dispatcher.finished_example();
     }
 
     inline int run(int argc, char* argv[])
