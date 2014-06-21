@@ -4,6 +4,7 @@
 #include "include/dispatcher.h"
 #include "include/registry.h"
 #include "include/reporter.h"
+#include "include/runner.h"
 
 #define BEGIN_TEST(_name) 		\
 namespace {				\
@@ -22,13 +23,13 @@ namespace {				\
 
 namespace test
 {
-    typedef Registry::block_t block_t;
+    typedef Runner::block_t block_t;
 
     inline void describe(const char* description, block_t block)
     {
-	auto& dispatcher = Dispatcher::instance();
+	auto& runner = Runner::instance();
 
-	dispatcher.started_group();
+	runner.started_group();
 
 	try
 	{
@@ -36,17 +37,17 @@ namespace test
 	}
 	catch(std::exception& e)
 	{
-	    dispatcher.caught(e);
+	    runner.caught(e);
 	}
 
-	dispatcher.finished_group();
+	runner.finished_group();
     }
 
     inline void it(const char* description, block_t block)
     {
-	auto& dispatcher = Dispatcher::instance();
+	auto& runner = Runner::instance();
 
-	dispatcher.started_example();
+	runner.started_example();
 
 	try
 	{
@@ -54,31 +55,22 @@ namespace test
 	}
 	catch(const std::exception& e)
 	{
-	    dispatcher.caught(e);
+	    runner.caught(e);
 	}
 	catch(...)
 	{
-	    dispatcher.caught_unknown();
+	    runner.caught_unknown();
 	}
 
-    	dispatcher.finished_example();
+	runner.finished_example();
     }
 
     inline int run(int argc, char* argv[])
     {
 	Reporter reporter;
+	Dispatcher::instance().register_reporter(&reporter);
 
-	auto& dispatcher = Dispatcher::instance();
-	dispatcher.register_reporter(&reporter);
-
-	dispatcher.started();
-
-	for( auto& block : Registry::instance() )
-	    block();
-
-	dispatcher.finished();
-
-	return 0;
+	return Runner::instance().run();
     }
 }
 
