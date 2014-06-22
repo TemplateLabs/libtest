@@ -70,17 +70,17 @@ namespace test
 		    {
 			block();
 		    }
-		    catch(const test::exception& e)
+		    catch(const test::exception& failure)
 		    {
-			caught(e);
+			dispatcher.failure(failure);
 		    }
-		    catch(const std::exception& e)
+		    catch(const std::exception& error)
 		    {
-			caught(e);
+			dispatcher.error(error);
 		    }
 		    catch(...)
 		    {
-			caught_unknown();
+			dispatcher.error();
 		    }
 
 		    dispatcher.finished_example();
@@ -101,36 +101,21 @@ namespace test
 	    {
 		block();
 	    }
-	    catch(const test::exception& e)
+	    catch(const test::exception& failure)
 	    {
-		caught(e);
+		dispatcher.failure(failure);
 	    }
-	    catch(const std::exception& e)
+	    catch(const std::exception& error)
 	    {
-		caught(e);
+		dispatcher.error(error);
 	    }
 	    catch(...)
 	    {
-		caught_unknown();
+		dispatcher.error();
 	    }
 
 	    if( run_mode )
 		dispatcher.finished_group();
-	}
-
-	void caught(const test::exception& error)
-	{
-	    dispatcher.caught(error);
-	}
-
-	void caught(const std::exception& error)
-	{
-	    dispatcher.caught(error);
-	}
-
-	void caught_unknown()
-	{
-	    dispatcher.caught_unknown();
 	}
 
     private:

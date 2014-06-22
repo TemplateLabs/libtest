@@ -29,19 +29,19 @@ namespace test
 	    _start_time = std::chrono::system_clock::now();
 	}
 
-	virtual void caught(const test::exception& error)
+	virtual void failure(const test::exception& failure)
 	{
 	    ++failure_count;
-	    std::cout << "FAILURE " << error.message() << std::endl;
+	    std::cout << "FAILURE " << failure.message() << std::endl;
 	}
 
-	virtual void caught(const std::exception& error)
+	virtual void error(const std::exception& error)
 	{
 	    ++error_count;
 	    std::cout << "ERROR " << error.what() << std::endl;
 	}
 
-	virtual void caught_unknown()
+	virtual void error()
 	{
 	    ++error_count;
 	    std::cout << "UNKNOWN ERROR\n";
