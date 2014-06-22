@@ -2,6 +2,7 @@
 #define LIBTEST_H
 
 #include "include/dispatcher.h"
+#include "include/exception.h"
 #include "include/registry.h"
 #include "include/reporter.h"
 #include "include/runner.h"
@@ -35,9 +36,17 @@ namespace test
 	{
 	    block();
 	}
-	catch(std::exception& e)
+	catch(const test::exception& e)
 	{
 	    runner.caught(e);
+	}
+	catch(const std::exception& e)
+	{
+	    runner.caught(e);
+	}
+	catch(...)
+	{
+	    runner.caught_unknown();
 	}
 
 	runner.finished_group();
@@ -52,6 +61,10 @@ namespace test
 	try
 	{
 	    block();
+	}
+	catch(const test::exception& e)
+	{
+	    runner.caught(e);
 	}
 	catch(const std::exception& e)
 	{

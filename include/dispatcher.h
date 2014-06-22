@@ -37,6 +37,12 @@ namespace test
 		reporter->started();
 	}
 
+	void caught(const test::exception& error)
+	{
+	    for( auto reporter : reporters )
+		reporter->caught(error);
+	}
+
 	void caught(const std::exception& error)
 	{
 	    for( auto reporter : reporters )

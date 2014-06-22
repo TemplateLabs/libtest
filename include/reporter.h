@@ -3,18 +3,25 @@
 
 #include <iostream>
 
+#include <include/exception.h>
+
 namespace test
 {
     struct Reporter
     {
-	Reporter() : example_count(0), failure_count(0) {}
+	Reporter() : error_count(0), example_count(0), failure_count(0) {}
 
 	virtual void finished()
 	{
 	    auto _end_time = std::chrono::system_clock::now();
 	    auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(_end_time - _start_time);
 	    std::cout << "Finished in " << duration.count() << " seconds\n";
-	    std::cout << example_count <<" examples, " << failure_count << " failures\n";
+	    std::cout << example_count <<" examples, " << failure_count << " failures";
+
+	    if( error_count )
+		std::cout << ", " << error_count;
+
+	    std::cout << std::endl;
 	}
 
 	virtual void started()
@@ -22,14 +29,22 @@ namespace test
 	    _start_time = std::chrono::system_clock::now();
 	}
 
-	virtual void caught(const std::exception& error)
+	virtual void caught(const test::exception& error)
 	{
 	    ++failure_count;
+	    std::cout << "FAILURE " << error.message() << std::endl;
+	}
+
+	virtual void caught(const std::exception& error)
+	{
+	    ++error_count;
+	    std::cout << "ERROR " << error.what() << std::endl;
 	}
 
 	virtual void caught_unknown()
 	{
-	    ++failure_count;
+	    ++error_count;
+	    std::cout << "UNKNOWN ERROR\n";
 	}
 
 	virtual void started_example()
@@ -50,6 +65,7 @@ namespace test
 	}
 
     private:
+	unsigned error_count;
 	unsigned example_count;
 	unsigned failure_count;
 	std::chrono::system_clock::time_point	_start_time;

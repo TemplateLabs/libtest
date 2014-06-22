@@ -33,6 +33,11 @@ namespace test
 	    return 0;
 	}
 
+	void caught(const test::exception& error)
+	{
+	    Dispatcher::instance().caught(error);
+	}
+
 	void caught(const std::exception& error)
 	{
 	    Dispatcher::instance().caught(error);
