@@ -26,14 +26,12 @@ namespace test
 	    instance().do_group(description, block);
 	}
 
-	Runner() noexcept {}
+	Runner() noexcept : dispatcher(Dispatcher::instance()) {}
 	Runner(const Runner&) = delete;
 	Runner& operator=(const Runner&) = delete;
 
 	int run()
 	{
-	    auto& dispatcher = Dispatcher::instance();
-
 	    dispatcher.started();
 
 	    // Count the examples
@@ -66,7 +64,7 @@ namespace test
 		// Is this the example to be run?
 		if( example_index == example_number )
 		{
-		    Dispatcher::instance().started_example();
+		    dispatcher.started_example();
 
 		    try
 		    {
@@ -85,7 +83,7 @@ namespace test
 			caught_unknown();
 		    }
 
-		    Dispatcher::instance().finished_example();
+		    dispatcher.finished_example();
 		}
 	    }
 
@@ -97,7 +95,7 @@ namespace test
 	    (void) description;
 
 	    if( run_mode )
-		Dispatcher::instance().started_group();
+		dispatcher.started_group();
 
 	    try
 	    {
@@ -117,25 +115,26 @@ namespace test
 	    }
 
 	    if( run_mode )
-		Dispatcher::instance().finished_group();
+		dispatcher.finished_group();
 	}
 
 	void caught(const test::exception& error)
 	{
-	    Dispatcher::instance().caught(error);
+	    dispatcher.caught(error);
 	}
 
 	void caught(const std::exception& error)
 	{
-	    Dispatcher::instance().caught(error);
+	    dispatcher.caught(error);
 	}
 
 	void caught_unknown()
 	{
-	    Dispatcher::instance().caught_unknown();
+	    dispatcher.caught_unknown();
 	}
 
     private:
+	Dispatcher& dispatcher;
 	unsigned example_index;
 	unsigned example_number;
 	bool run_mode = false;
