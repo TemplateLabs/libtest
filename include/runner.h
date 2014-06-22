@@ -16,6 +16,16 @@ namespace test
 	    return runner;
 	}
 
+	static void example(const char* description, block_t block)
+	{
+	    instance().do_example(description, block);
+	}
+
+	static void group(const char* description, block_t block)
+	{
+	    instance().do_group(description, block);
+	}
+
 	Runner() noexcept {}
 	Runner(const Runner&) = delete;
 	Runner& operator=(const Runner&) = delete;
@@ -82,6 +92,34 @@ namespace test
 	    ++example_index;
 	}
 
+	void do_group(const char* description, block_t block)
+	{
+	    (void) description;
+
+	    if( run_mode )
+		Dispatcher::instance().started_group();
+
+	    try
+	    {
+		block();
+	    }
+	    catch(const test::exception& e)
+	    {
+		caught(e);
+	    }
+	    catch(const std::exception& e)
+	    {
+		caught(e);
+	    }
+	    catch(...)
+	    {
+		caught_unknown();
+	    }
+
+	    if( run_mode )
+		Dispatcher::instance().finished_group();
+	}
+
 	void caught(const test::exception& error)
 	{
 	    Dispatcher::instance().caught(error);
@@ -95,16 +133,6 @@ namespace test
 	void caught_unknown()
 	{
 	    Dispatcher::instance().caught_unknown();
-	}
-
-	void started_group()
-	{
-	    Dispatcher::instance().started_group();
-	}
-
-	void finished_group()
-	{
-	    Dispatcher::instance().finished_group();
 	}
 
     private:

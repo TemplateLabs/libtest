@@ -28,33 +28,12 @@ namespace test
 
     inline void describe(const char* description, block_t block)
     {
-	auto& runner = Runner::instance();
-
-	runner.started_group();
-
-	try
-	{
-	    block();
-	}
-	catch(const test::exception& e)
-	{
-	    runner.caught(e);
-	}
-	catch(const std::exception& e)
-	{
-	    runner.caught(e);
-	}
-	catch(...)
-	{
-	    runner.caught_unknown();
-	}
-
-	runner.finished_group();
+	Runner::group(description, block);
     }
 
     inline void it(const char* description, block_t block)
     {
-	Runner::instance().do_example(description, block);
+	Runner::example(description, block);
     }
 
     inline int run(int argc, char* argv[])
