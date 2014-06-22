@@ -54,28 +54,7 @@ namespace test
 
     inline void it(const char* description, block_t block)
     {
-	auto& runner = Runner::instance();
-
-	runner.started_example();
-
-	try
-	{
-	    block();
-	}
-	catch(const test::exception& e)
-	{
-	    runner.caught(e);
-	}
-	catch(const std::exception& e)
-	{
-	    runner.caught(e);
-	}
-	catch(...)
-	{
-	    runner.caught_unknown();
-	}
-
-	runner.finished_example();
+	Runner::instance().do_example(description, block);
     }
 
     inline int run(int argc, char* argv[])
