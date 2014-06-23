@@ -6,6 +6,7 @@
 #include "include/registry.h"
 #include "include/reporter.h"
 #include "include/runner.h"
+#include "matchers/matchers.h"
 
 #define BEGIN_TEST(_name) 		\
 namespace {				\
