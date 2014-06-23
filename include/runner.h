@@ -1,6 +1,8 @@
 #ifndef LIBTEST_RUNNER_H
 #define LIBTEST_RUNNER_H
 
+#include <map>
+
 #include "dispatcher.h"
 #include "registry.h"
 
@@ -37,6 +39,7 @@ namespace test
 	    // Count the examples
 	    run_mode = false;
 	    example_index = 0;
+	    group_index = 0;
 	    for( auto& block : Registry::instance() )
 		block();
 
@@ -48,6 +51,7 @@ namespace test
 	    for( example_number = 0; example_number < example_count; ++example_number )
 	    {
 		example_index = 0;
+		group_index = 0;
 		for( auto& block : Registry::instance() )
 		    block();
 	    }
@@ -94,8 +98,19 @@ namespace test
 	{
 	    (void) description;
 
+	    const auto first_example_index = example_index;
+	    const auto this_group_index = group_index++;
+
+	    bool has_example = false;
 	    if( run_mode )
-		dispatcher.started_group();
+	    {
+		const auto range = group_map[this_group_index];
+		if( (example_number >= range.first) && (example_number < range.second) )
+		{
+		    dispatcher.started_group();
+		    has_example = true;
+		}
+	    }
 
 	    try
 	    {
@@ -115,13 +130,23 @@ namespace test
 	    }
 
 	    if( run_mode )
-		dispatcher.finished_group();
+	    {
+		if( has_example )
+		    dispatcher.finished_group();
+	    }
+	    else
+	    {
+		const auto ope_example_index = example_index;
+		group_map[this_group_index] = std::make_pair(first_example_index, ope_example_index);
+	    }
 	}
 
     private:
 	Dispatcher& dispatcher;
 	unsigned example_index;
 	unsigned example_number;
+	std::map<unsigned, std::pair<unsigned, unsigned>> group_map;
+	unsigned group_index;
 	bool run_mode = false;
     };
 };
