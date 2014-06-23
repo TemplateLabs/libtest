@@ -21,13 +21,18 @@ end
 directory 'build'
 CLEAN << 'build'
 
-file 'build/test' => ['build', *TEST_OBJS] do |task|
-    sh "cc -lstdc++ -o #{task.name} #{task.sources.drop(1).join(' ')}"
+TEST_OBJS.each do |f|
+    directory f.pathmap('%d')
+    file f => f.pathmap('%d')
+end
+
+file 'build/test' => TEST_OBJS do |task|
+    sh "cc -lstdc++ -o #{task.name} #{task.sources.join ' '}"
 end
 CLOBBER << 'build/test'
 
 task :default => :test
 
-task test:'build/test' do
+task test:['build', 'build/test'] do
     sh "build/test"
 end
