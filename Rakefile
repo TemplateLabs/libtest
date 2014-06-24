@@ -4,7 +4,7 @@ TEST_SOURCES = FileList['test/**/*.cc']
 TEST_OBJS = TEST_SOURCES.pathmap("%{^test/,build/}X.o")
 CLEAN.include TEST_OBJS
 
-CC = 'cc'
+CC = ENV['CXX'] || 'cc'
 INCDIRS = '.'.pathmap('-I%p')
 
 CXXFLAGS = %w[-std=c++11].join ' '
@@ -27,7 +27,7 @@ TEST_OBJS.each do |f|
 end
 
 file 'build/test' => TEST_OBJS do |task|
-    sh "cc -lstdc++ -o #{task.name} #{task.sources.join ' '}"
+    sh "#{CC} -lstdc++ -o #{task.name} #{task.sources.join ' '}"
 end
 CLOBBER << 'build/test'
 

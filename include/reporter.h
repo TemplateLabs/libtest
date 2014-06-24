@@ -1,6 +1,7 @@
 #ifndef LIBTEST_REPORTER_H
 #define LIBTEST_REPORTER_H
 
+#include <chrono>
 #include <iostream>
 
 #include <include/exception.h>

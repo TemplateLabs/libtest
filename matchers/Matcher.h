@@ -1,6 +1,7 @@
 #ifndef LIBTEST_MATCHER_H
 #define LIBTEST_MATCHER_H
 
+#include <memory>
 #include <sstream>
 
 namespace test

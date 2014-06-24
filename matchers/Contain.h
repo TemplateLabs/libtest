@@ -1,6 +1,7 @@
 #ifndef LIBTEST_CONTAIN_H
 #define LIBTEST_CONTAIN_H
 
+#include <algorithm>
 #include <cstring>
 #include <vector>
 

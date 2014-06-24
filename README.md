@@ -1,5 +1,7 @@
 Testing all the things
 ======================
+[![Build Status](https://travis-ci.org/TemplateLabs/libtest.png)](https://travis-ci.org/TemplateLabs/libtest)
+
 
 Do you have things to do, and code to test? Does C++ make your eyes bleed? If so,
 then step right up, because you've come to the right place.

@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <test.h>
 
 TEST_BEGIN(ThrowException)
