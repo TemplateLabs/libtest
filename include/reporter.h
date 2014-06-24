@@ -25,13 +25,24 @@ namespace test
 		std::cout << "s";
 
 	    if( error_count )
-		std::cout << ", " << error_count;
+	    {
+		std::cout << ", " << error_count << " error";
+		if( error_count != 1 )
+		    std::cout << "s";
+	    }
+
+	    if( skip_count )
+		std::cout << ", " << skip_count << " skipped";
 
 	    std::cout << std::endl;
 	}
 
 	virtual void started()
 	{
+	    error_count = 0;
+	    example_count = 0;
+	    failure_count = 0;
+	    skip_count = 0;
 	    _start_time = std::chrono::system_clock::now();
 	}
 
@@ -89,6 +100,12 @@ namespace test
 	    description_stack.pop_back();
 	}
 
+	virtual void skipped_example(description_t description)
+	{
+	    ++example_count;
+	    ++skip_count;
+	}
+
 	virtual void started_group(description_t description)
 	{
 	    description_stack.push_back(description);
@@ -97,6 +114,10 @@ namespace test
 	virtual void finished_group()
 	{
 	    description_stack.pop_back();
+	}
+
+	virtual void skipped_group(description_t description)
+	{
 	}
 
     protected:
@@ -111,6 +132,7 @@ namespace test
 	unsigned example_count;
 	unsigned failure_count;
 	description_stack_t	description_stack;
+	unsigned skip_count;
 	std::chrono::system_clock::time_point	_start_time;
     };
 };

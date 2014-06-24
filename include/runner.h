@@ -28,6 +28,16 @@ namespace test
 	    instance().do_group(description, block);
 	}
 
+	static void skip_example(const char* description, block_t block)
+	{
+	    instance().do_example(description, block, true);
+	}
+
+	static void skip_group(const char* description, block_t block)
+	{
+	    instance().do_group(description, block, true);
+	}
+
 	Runner() noexcept : dispatcher(Dispatcher::instance()) {}
 	Runner(const Runner&) = delete;
 	Runner& operator=(const Runner&) = delete;
@@ -52,6 +62,7 @@ namespace test
 	    {
 		example_index = 0;
 		group_index = 0;
+		group_skip = false;
 		for( auto& block : Registry::instance() )
 		    block();
 	    }
@@ -61,42 +72,48 @@ namespace test
 	    return 0;
 	}
 
-	void do_example(const char* description, block_t block)
+	void do_example(const char* description, block_t block, bool skip=false)
 	{
 	    if( run_mode )
 	    {
 		// Is this the example to be run?
 		if( example_index == example_number )
 		{
-		    dispatcher.started_example(description);
+		    if( skip || group_skip )
+			dispatcher.skipped_example(description);
+		    else
+		    {
+			dispatcher.started_example(description);
 
-		    try
-		    {
-			block();
-		    }
-		    catch(const test::exception& failure)
-		    {
-			dispatcher.failure(failure);
-		    }
-		    catch(const std::exception& error)
-		    {
-			dispatcher.error(error);
-		    }
-		    catch(...)
-		    {
-			dispatcher.error();
-		    }
+			try
+			{
+			    block();
+			}
+			catch(const test::exception& failure)
+			{
+			    dispatcher.failure(failure);
+			}
+			catch(const std::exception& error)
+			{
+			    dispatcher.error(error);
+			}
+			catch(...)
+			{
+			    dispatcher.error();
+			}
 
-		    dispatcher.finished_example();
+			dispatcher.finished_example();
+		    }
 		}
 	    }
 
 	    ++example_index;
 	}
 
-	void do_group(const char* description, block_t block)
+	void do_group(const char* description, block_t block, bool skip=false)
 	{
 	    const auto first_example_index = example_index;
+	    const bool already_skipping = group_skip;
 	    const auto this_group_index = group_index++;
 
 	    bool has_example = false;
@@ -107,6 +124,9 @@ namespace test
 		{
 		    dispatcher.started_group(description);
 		    has_example = true;
+
+		    if( skip )
+			group_skip = true;
 		}
 	    }
 
@@ -130,7 +150,13 @@ namespace test
 	    if( run_mode )
 	    {
 		if( has_example )
+		{
 		    dispatcher.finished_group();
+
+		    // Finished skipping this group
+		    if( skip && !already_skipping )
+			group_skip = false;
+		}
 	    }
 	    else
 	    {
@@ -148,6 +174,7 @@ namespace test
 
 	std::map<unsigned, std::pair<unsigned, unsigned>> group_map;
 	unsigned group_index;
+	bool group_skip;
     };
 };
 

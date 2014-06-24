@@ -69,6 +69,12 @@ namespace test
 		reporter->finished_example();
 	}
 
+	void skipped_example(description_t description)
+	{
+	    for( auto reporter : reporters )
+		reporter->skipped_example(description);
+	}
+
 	void started_group(description_t description)
 	{
 	    for( auto reporter : reporters )
@@ -79,6 +85,12 @@ namespace test
 	{
 	    for( auto reporter : reporters )
 		reporter->finished_group();
+	}
+
+	void skipped_group(description_t description)
+	{
+	    for( auto reporter : reporters )
+		reporter->skipped_group(description);
 	}
 
     private:

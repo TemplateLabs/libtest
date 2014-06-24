@@ -37,6 +37,16 @@ namespace test
 	Runner::example(description, block);
     }
 
+    inline void xdescribe(const char* description, block_t block)
+    {
+	Runner::skip_group(description, block);
+    }
+
+    inline void xit(const char* description, block_t block)
+    {
+	Runner::skip_example(description, block);
+    }
+
     inline int run(int argc, char* argv[])
     {
 	Reporter reporter;
