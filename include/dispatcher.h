@@ -10,6 +10,8 @@ namespace test
 {
     struct Dispatcher
     {
+	typedef Reporter::description_t	description_t;
+
 	static Dispatcher& instance()
 	{
 	    static Dispatcher dispatcher;
@@ -55,10 +57,10 @@ namespace test
 		reporter->error();
 	}
 
-	void started_example()
+	void started_example(description_t description)
 	{
 	    for( auto reporter : reporters )
-		reporter->started_example();
+		reporter->started_example(description);
 	}
 
 	void finished_example()
@@ -67,10 +69,10 @@ namespace test
 		reporter->finished_example();
 	}
 
-	void started_group()
+	void started_group(description_t description)
 	{
 	    for( auto reporter : reporters )
-		reporter->started_group();
+		reporter->started_group(description);
 	}
 
 	void finished_group()

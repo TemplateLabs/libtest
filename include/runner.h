@@ -68,7 +68,7 @@ namespace test
 		// Is this the example to be run?
 		if( example_index == example_number )
 		{
-		    dispatcher.started_example();
+		    dispatcher.started_example(description);
 
 		    try
 		    {
@@ -96,8 +96,6 @@ namespace test
 
 	void do_group(const char* description, block_t block)
 	{
-	    (void) description;
-
 	    const auto first_example_index = example_index;
 	    const auto this_group_index = group_index++;
 
@@ -107,7 +105,7 @@ namespace test
 		const auto range = group_map[this_group_index];
 		if( (example_number >= range.first) && (example_number < range.second) )
 		{
-		    dispatcher.started_group();
+		    dispatcher.started_group(description);
 		    has_example = true;
 		}
 	    }
@@ -143,11 +141,13 @@ namespace test
 
     private:
 	Dispatcher& dispatcher;
+
 	unsigned example_index;
 	unsigned example_number;
+	bool run_mode = false;
+
 	std::map<unsigned, std::pair<unsigned, unsigned>> group_map;
 	unsigned group_index;
-	bool run_mode = false;
     };
 };
 
