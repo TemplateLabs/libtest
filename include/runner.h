@@ -2,6 +2,7 @@
 #define LIBTEST_RUNNER_H
 
 #include <map>
+#include <set>
 
 #include "dispatcher.h"
 #include "registry.h"
@@ -28,6 +29,16 @@ namespace test
 	    instance().do_group(description, block);
 	}
 
+	static void focus_example(const char* description, block_t block)
+	{
+	    instance().do_example(description, block, true, true);
+	}
+
+	static void focus_group(const char* description, block_t block)
+	{
+	    instance().do_group(description, block, true, true);
+	}
+
 	static void skip_example(const char* description, block_t block)
 	{
 	    instance().do_example(description, block, true);
@@ -48,6 +59,7 @@ namespace test
 
 	    // Count the examples
 	    run_mode = false;
+	    group_focus = false;
 	    example_index = 0;
 	    group_index = 0;
 	    for( auto& block : Registry::instance() )
@@ -56,15 +68,20 @@ namespace test
 	    // example_index should now correspond to the number of examples to be run
 	    const unsigned example_count = example_index;
 
-	    // Now run all of the examples
 	    run_mode = true;
-	    for( example_number = 0; example_number < example_count; ++example_number )
+	    // If there are focused examples, run only those
+	    if( focus_set.size() )
 	    {
-		example_index = 0;
-		group_index = 0;
-		group_skip = false;
-		for( auto& block : Registry::instance() )
-		    block();
+		for( auto focus_number : focus_set )
+		{
+		    example_number = focus_number;
+		    run_all_registry_blocks();
+		}
+	    }
+	    else    // Otherwise, run all of the examples
+	    {
+		for( example_number = 0; example_number < example_count; ++example_number )
+		    run_all_registry_blocks();
 	    }
 
 	    dispatcher.finished();
@@ -72,14 +89,15 @@ namespace test
 	    return 0;
 	}
 
-	void do_example(const char* description, block_t block, bool skip=false)
+	void do_example(const char* description, block_t block, bool skip=false, bool focus=false)
 	{
 	    if( run_mode )
 	    {
 		// Is this the example to be run?
 		if( example_index == example_number )
 		{
-		    if( skip || group_skip )
+		    // Skipping isn't allowed while focusing
+		    if( (skip || group_skip) && !(focus || group_focus) )
 			dispatcher.skipped_example(description);
 		    else
 		    {
@@ -106,13 +124,18 @@ namespace test
 		    }
 		}
 	    }
+	    else if( (focus || group_focus) && !group_skip )
+	    {
+		focus_set.insert(example_index);
+	    }
 
 	    ++example_index;
 	}
 
-	void do_group(const char* description, block_t block, bool skip=false)
+	void do_group(const char* description, block_t block, bool skip=false, bool focus=false)
 	{
 	    const auto first_example_index = example_index;
+	    const bool already_focused = group_focus;
 	    const bool already_skipping = group_skip;
 	    const auto this_group_index = group_index++;
 
@@ -124,11 +147,18 @@ namespace test
 		{
 		    dispatcher.started_group(description);
 		    has_example = true;
-
-		    if( skip )
-			group_skip = true;
 		}
 	    }
+
+	    if( skip )
+		group_skip = true;
+
+	    // A group can't be focused if a parent group is skipped
+	    if( group_skip )
+		focus = false;
+
+	    if( focus )
+		group_focus = true;
 
 	    try
 	    {
@@ -152,10 +182,6 @@ namespace test
 		if( has_example )
 		{
 		    dispatcher.finished_group();
-
-		    // Finished skipping this group
-		    if( skip && !already_skipping )
-			group_skip = false;
 		}
 	    }
 	    else
@@ -163,6 +189,13 @@ namespace test
 		const auto ope_example_index = example_index;
 		group_map[this_group_index] = std::make_pair(first_example_index, ope_example_index);
 	    }
+
+	    // Finished skipping this group
+	    if( skip && !already_skipping )
+		group_skip = false;
+
+	    if( focus && !already_focused )
+		group_focus = false;
 	}
 
     private:
@@ -172,9 +205,21 @@ namespace test
 	unsigned example_number;
 	bool run_mode = false;
 
+	std::set<unsigned> focus_set;
 	std::map<unsigned, std::pair<unsigned, unsigned>> group_map;
+	bool group_focus;
 	unsigned group_index;
 	bool group_skip;
+
+	void run_all_registry_blocks()
+	{
+	    example_index = 0;
+	    group_focus = false;
+	    group_index = 0;
+	    group_skip = false;
+	    for( auto& block : Registry::instance() )
+		block();
+	}
     };
 };
 

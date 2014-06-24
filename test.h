@@ -37,6 +37,16 @@ namespace test
 	Runner::example(description, block);
     }
 
+    inline void fdescribe(const char* description, block_t block)
+    {
+	Runner::focus_group(description, block);
+    }
+
+    inline void fit(const char* description, block_t block)
+    {
+	Runner::focus_example(description, block);
+    }
+
     inline void xdescribe(const char* description, block_t block)
     {
 	Runner::skip_group(description, block);
