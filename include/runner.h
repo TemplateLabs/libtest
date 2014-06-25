@@ -58,30 +58,24 @@ namespace test
 	    dispatcher.started();
 
 	    // Count the examples
-	    run_mode = false;
-	    group_focus = false;
-	    example_index = 0;
-	    group_index = 0;
-	    for( auto& block : Registry::instance() )
-		block();
+	    Registry::instance().run();
 
 	    // example_index should now correspond to the number of examples to be run
 	    const unsigned example_count = example_index;
 
-	    run_mode = true;
 	    // If there are focused examples, run only those
 	    if( focus_set.size() )
 	    {
 		for( auto focus_number : focus_set )
 		{
 		    example_number = focus_number;
-		    run_all_registry_blocks();
+		    run_all_registry_blocks(true);
 		}
 	    }
 	    else    // Otherwise, run all of the examples
 	    {
 		for( example_number = 0; example_number < example_count; ++example_number )
-		    run_all_registry_blocks();
+		    run_all_registry_blocks(true);
 	    }
 
 	    dispatcher.finished();
@@ -211,14 +205,14 @@ namespace test
 	unsigned group_index;
 	bool group_skip;
 
-	void run_all_registry_blocks()
+	void run_all_registry_blocks(bool mode=false)
 	{
+	    run_mode = mode;
 	    example_index = 0;
 	    group_focus = false;
 	    group_index = 0;
 	    group_skip = false;
-	    for( auto& block : Registry::instance() )
-		block();
+	    Registry::instance().run();
 	}
     };
 };

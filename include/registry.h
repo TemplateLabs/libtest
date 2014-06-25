@@ -28,8 +28,11 @@ namespace test
 	    return block;
 	}
 
-	const_iterator begin() const noexcept	{ return blocks.begin(); }
-	const_iterator end() const noexcept	{ return blocks.end(); }
+	void run()
+	{
+	    for( auto& block : blocks )
+		block();
+	}
 
     private:
 	blocks_t blocks;
