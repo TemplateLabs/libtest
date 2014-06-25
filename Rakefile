@@ -7,7 +7,12 @@ CLEAN.include TEST_OBJS
 CC = ENV['CXX'] || 'cc'
 INCDIRS = '.'.pathmap('-I%p')
 
-CFLAGS = %w[-Wdeprecated -Wdeprecated-declarations -Wshadow -Wall -W -Werror -Wfloat-equal -Wundef -Wendif-labels].join ' '
+unless (ENV['CXX'] == 'g++-4.8')	# GCC is too aggressive with some warnings
+    CFLAGS = %w[-Wdeprecated -Wdeprecated-declarations -Wshadow -Wall -W -Werror -Wfloat-equal -Wundef -Wendif-labels].join ' '
+else
+    CFLAGS = ''
+end
+
 CXXFLAGS = %w[-std=c++11].join ' '
 
 def source_for_object(name)
