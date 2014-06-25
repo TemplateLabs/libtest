@@ -53,7 +53,7 @@ namespace test
 
 	    std::cout << "\nFAILURE";
 
-	    joined_description(std::cout, description_stack);
+	    joined_description(std::cout);
 
 	    std::cout << " (" << failure.filename() << ":" << failure.linenumber() << ")";
 
@@ -71,7 +71,7 @@ namespace test
 
 	    std::cout << "\nERROR";
 
-	    joined_description(std::cout, description_stack);
+	    joined_description(std::cout);
 
 	    if( description_stack.size() )
 		std::cout << std::endl;
@@ -86,7 +86,7 @@ namespace test
 	    ++error_count;
 
 	    std::cout << "\nUNKNOWN ERROR";
-	    joined_description(std::cout, description_stack);
+	    joined_description(std::cout);
 	    std::cout << std::endl;
 	}
 
@@ -103,6 +103,7 @@ namespace test
 
 	virtual void skipped_example(description_t description)
 	{
+	    (void) description;
 	    ++example_count;
 	    ++skip_count;
 	}
@@ -119,10 +120,11 @@ namespace test
 
 	virtual void skipped_group(description_t description)
 	{
+	    (void) description;
 	}
 
     protected:
-	void joined_description(std::ostream& os, description_stack_t& description_stack)
+	void joined_description(std::ostream& os)
 	{
 	    for( const char* description : description_stack )
 		os << " " << description;

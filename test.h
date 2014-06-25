@@ -59,6 +59,9 @@ namespace test
 
     inline int run(int argc, char* argv[])
     {
+	(void)argc;
+	(void)argv;
+
 	Reporter reporter;
 	Dispatcher::instance().register_reporter(&reporter);
 

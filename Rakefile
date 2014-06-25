@@ -7,6 +7,7 @@ CLEAN.include TEST_OBJS
 CC = ENV['CXX'] || 'cc'
 INCDIRS = '.'.pathmap('-I%p')
 
+CFLAGS = %w[-Wdeprecated -Wdeprecated-declarations -Wshadow -Wall -W -Werror -Wfloat-equal -Wundef -Wendif-labels].join ' '
 CXXFLAGS = %w[-std=c++11].join ' '
 
 def source_for_object(name)
@@ -15,7 +16,7 @@ def source_for_object(name)
 end
 
 rule '.o' => ->(name){ source_for_object(name) } do |t|
-    sh "#{CC} #{INCDIRS} #{CXXFLAGS} -c -o #{t.name} #{t.source}"
+    sh "#{CC} #{INCDIRS} #{CFLAGS} #{CXXFLAGS} -c -o #{t.name} #{t.source}"
 end
 
 directory 'build'
